@@ -589,7 +589,7 @@ function DetailModal({ debate: init, address, player, onClose, onAction, fetchDe
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(4,4,10,0.90)', zIndex: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)', padding: '16px' }} onClick={onClose}>
-      <div style={{ backgroundColor: SURFACE, border: `1px solid ${ACCENT}33`, borderRadius: '20px', padding: '24px 20px 32px', width: '100%', maxWidth: '660px', maxHeight: '85vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+      <div style={{ backgroundColor: SURFACE, border: `1px solid ${ACCENT}33`, borderRadius: '20px', padding: '24px 20px 32px', width: '100%', maxWidth: '660px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
           <div style={{ flex: 1, paddingRight: '12px' }}>
