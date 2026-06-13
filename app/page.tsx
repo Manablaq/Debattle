@@ -235,7 +235,7 @@ export default function Home() {
                 <span style={{ background: `linear-gradient(135deg, #A855F7, #7C3AED)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Debate Arena</span>
               </h1>
               <p style={{ color: MUTED, fontSize: 'clamp(13px,2vw,16px)', maxWidth: '480px', lineHeight: 1.7, marginBottom: '24px' }}>
-                Stake points, argue your side, and let 5 independent AI validators judge the winner. No bias. No politics. Pure logic.
+                Stake points, argue your side, and let 5 independent GenLayer validators judge the winner. No bias. No politics. Pure logic.
               </p>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px' }}>
                 <div style={{ backgroundColor: '#27272A', border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '10px 16px', textAlign: 'center' }}>
@@ -266,20 +266,28 @@ export default function Home() {
             </div>
 
             {/* How it works */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '24px' }}>
-              {[
-                { icon: '1️⃣', title: 'Create', desc: 'Pick a topic, stake points' },
-                { icon: '2️⃣', title: 'Opponent Joins', desc: 'Matches your stake' },
-                { icon: '3️⃣', title: 'Both Argue', desc: 'Submit your best argument' },
-                { icon: '4️⃣', title: 'AI Judges', desc: '5 validators score both sides' },
-                { icon: '5️⃣', title: 'Claim Points', desc: 'Winner takes both stakes' },
-              ].map(s => (
-                <div key={s.title} style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '14px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '20px', marginBottom: '6px' }}>{s.icon}</div>
-                  <p style={{ fontWeight: 600, fontSize: '13px', marginBottom: '3px' }}>{s.title}</p>
-                  <p style={{ color: MUTED, fontSize: '11px' }}>{s.desc}</p>
-                </div>
-              ))}
+            <div style={{ marginBottom: '28px' }}>
+              <p style={{ fontSize: '12px', color: MUTED, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>How it works</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
+                {[
+                  { num: '01', title: 'Create a Debate', desc: 'Choose a topic, set your stake, and pick a category. AI validators verify the topic is fair and arguable.', color: PURPLE },
+                  { num: '02', title: 'Opponent Joins', desc: 'Any player can accept your challenge by matching your stake. Both sides are now locked in.', color: '#A855F7' },
+                  { num: '03', title: 'Submit Arguments', desc: 'Both players write their best arguments independently. Neither can see the other argument until judging begins.', color: '#60a5fa' },
+                  { num: '04', title: 'AI Validators Judge', desc: '5 independent GenLayer validators score each argument on logic, evidence, persuasiveness, and clarity — reaching consensus.', color: WARNING },
+                  { num: '05', title: 'Winner Claims Points', desc: 'The verdict is on-chain and permanent. The winner claims both stakes. Losers can appeal under strict conditions.', color: GOLD },
+                ].map((s, i) => (
+                  <div key={s.num} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', position: 'relative' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: `${s.color}18`, border: `1px solid ${s.color}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800, color: s.color, zIndex: 1 }}>{s.num}</div>
+                      {i < 4 && <div style={{ width: '1px', height: '28px', backgroundColor: BORDER, margin: '4px 0' }} />}
+                    </div>
+                    <div style={{ paddingBottom: i < 4 ? '0' : '0', paddingTop: '6px' }}>
+                      <p style={{ fontWeight: 700, fontSize: '14px', marginBottom: '3px', color: TEXT }}>{s.title}</p>
+                      <p style={{ color: MUTED, fontSize: '12px', lineHeight: 1.6, marginBottom: i < 4 ? '8px' : '0' }}>{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Category filters */}
