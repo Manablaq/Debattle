@@ -589,7 +589,7 @@ function DetailModal({ debate: init, address, player, onClose, onAction, fetchDe
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(4,4,10,0.90)', zIndex: 150, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backdropFilter: 'blur(4px)' }} onClick={onClose}>
-      <div style={{ backgroundColor: SURFACE, border: `1px solid ${BORDER}`, borderTop: `1px solid ${ACCENT}33`, borderRadius: '20px 20px 0 0', padding: '24px 20px 32px', width: '100%', maxWidth: '660px', maxHeight: '92vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+      <div style={{ backgroundColor: SURFACE, border: `1px solid ${BORDER}`, borderTop: `1px solid ${ACCENT}33`, borderRadius: '20px 20px 0 0', padding: '24px 20px 32px', width: '100%', maxWidth: '660px', maxHeight: '80vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         {/* Handle */}
         <div style={{ width: '40px', height: '4px', background: BORDER, borderRadius: '2px', margin: '0 auto 20px' }} />
 
@@ -731,7 +731,7 @@ function CreateModal({ player, onClose, onSubmit, loading }: {
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(4,4,10,0.90)', zIndex: 150, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backdropFilter: 'blur(4px)' }} onClick={onClose}>
-      <div style={{ backgroundColor: SURFACE, border: `1px solid ${BORDER}`, borderTop: `1px solid ${ACCENT}33`, borderRadius: '20px 20px 0 0', padding: '24px 20px 36px', width: '100%', maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+      <div style={{ backgroundColor: SURFACE, border: `1px solid ${BORDER}`, borderTop: `1px solid ${ACCENT}33`, borderRadius: '20px 20px 0 0', padding: '24px 20px 36px', width: '100%', maxWidth: '580px', maxHeight: '75vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         <div style={{ width: '40px', height: '4px', background: BORDER, borderRadius: '2px', margin: '0 auto 20px' }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.02em' }}>⚔️ Create Debate</h2>
