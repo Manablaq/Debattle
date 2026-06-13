@@ -184,12 +184,13 @@ export default function Home() {
       <header style={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: `${SURFACE}EE`, backdropFilter: 'blur(12px)', borderBottom: `1px solid ${BORDER}` }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', height: '60px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0, marginRight: '12px' }}>
-            <div style={{ width: '34px', height: '34px', background: `linear-gradient(135deg, ${GLOW}, ${ACCENT})`, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', boxShadow: `0 0 16px ${GLOW}55` }}>⚔️</div>
-            <div>
-              <div style={{ fontWeight: 900, fontSize: '16px', letterSpacing: '-0.02em', lineHeight: 1 }}>DeBattle</div>
-              <div style={{ fontSize: '9px', color: MUTED, letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1 }}>On-Chain Arena</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, marginRight: '8px' }}>
+            <div style={{ width: '32px', height: '32px', background: `linear-gradient(135deg, ${GLOW}, ${ACCENT})`, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', boxShadow: `0 0 14px ${GLOW}55`, flexShrink: 0 }}>⚔️</div>
+            <div style={{ display: 'none' }} className="logo-text">
+              <div style={{ fontWeight: 900, fontSize: '15px', letterSpacing: '-0.02em', lineHeight: 1 }}>DeBattle</div>
+              <div style={{ fontSize: '8px', color: MUTED, letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1 }}>On-Chain Arena</div>
             </div>
+            <div style={{ fontWeight: 900, fontSize: '15px', letterSpacing: '-0.02em' }}>DeBattle</div>
           </div>
 
           {/* Tabs */}
@@ -204,8 +205,8 @@ export default function Home() {
           {/* Right */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
             {player?.registered === 'true' && (
-              <div style={{ background: `linear-gradient(135deg, ${GLOW}33, ${ACCENT}22)`, border: `1px solid ${ACCENT}44`, borderRadius: '20px', padding: '5px 14px', fontSize: '13px', fontWeight: 700, color: GOLD, display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ fontSize: '14px' }}>⚡</span>{player.points} pts
+              <div style={{ background: `linear-gradient(135deg, ${GLOW}33, ${ACCENT}22)`, border: `1px solid ${ACCENT}44`, borderRadius: '20px', padding: '5px 12px', fontSize: '13px', fontWeight: 700, color: GOLD, display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                <span style={{ fontSize: '13px' }}>⚡</span>{player.points}
               </div>
             )}
             <ConnectButton showBalance={false} chainStatus="none" accountStatus="avatar" />
@@ -271,7 +272,7 @@ export default function Home() {
                     </button>
                   )}
                 </div>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px' }}>
                   <StatPill label="Debates" value={stats.total_debates ?? '0'} color={ACCENT} />
                   <StatPill label="Open" value={stats.open_debates ?? '0'} color={SUCCESS} />
                   <StatPill label="Players" value={stats.total_players ?? '0'} color={GOLD} />
@@ -283,7 +284,7 @@ export default function Home() {
             {/* How it works */}
             <div style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
               <p style={{ fontSize: '11px', color: MUTED, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '20px' }}>How It Works</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1px', backgroundColor: BORDER }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1px', backgroundColor: BORDER }}>
                 {[
                   { n: '01', icon: '📌', title: 'Create', desc: 'Post a topic, set your stake. AI validates fairness.' },
                   { n: '02', icon: '🤝', title: 'Opponent Joins', desc: 'Any player matches your stake to accept.' },
@@ -369,46 +370,31 @@ export default function Home() {
               <EmptyState icon="🏆" title="No players yet" sub="Register and be the first on the board" />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {/* Top 3 podium */}
-                {leaderboard.length >= 3 && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '16px' }}>
-                    {[leaderboard[1], leaderboard[0], leaderboard[2]].map((p, podiumIdx) => {
-                      const rank = podiumIdx === 0 ? 2 : podiumIdx === 1 ? 1 : 3
-                      const heights = ['70px', '90px', '60px']
-                      const medals = ['🥈', '🥇', '🥉']
-                      const colors = ['#9CA3AF', GOLD, '#B45309']
-                      return (
-                        <div key={p.address} style={{ backgroundColor: CARD, border: `1px solid ${rank === 1 ? GOLD + '44' : BORDER}`, borderRadius: '14px', padding: '16px 12px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', marginTop: heights[podiumIdx], transition: 'margin-top 0.3s', boxShadow: rank === 1 ? `0 0 30px ${GOLD}22` : 'none' }}>
-                          <div style={{ fontSize: '28px' }}>{medals[podiumIdx]}</div>
-                          <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: `linear-gradient(135deg, ${colors[podiumIdx]}44, ${colors[podiumIdx]}22)`, border: `2px solid ${colors[podiumIdx]}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, color: colors[podiumIdx] }}>
-                            {p.username ? p.username[0].toUpperCase() : '?'}
-                          </div>
-                          <p style={{ fontWeight: 700, fontSize: '13px', color: TEXT }}>{p.username || shortAddr(p.address)}</p>
-                          <p style={{ fontSize: '18px', fontWeight: 800, color: colors[podiumIdx] }}>{p.wins}</p>
-                          <p style={{ fontSize: '10px', color: MUTED }}>wins · {p.points} pts</p>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-                {/* Rest of leaderboard */}
-                {leaderboard.slice(3).map((p, i) => (
-                  <div key={p.address} style={{ backgroundColor: CARD, border: `1px solid ${BORDER}`, borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: MUTED, width: '24px', textAlign: 'center', flexShrink: 0 }}>#{i + 4}</span>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: `${GLOW}22`, border: `1px solid ${GLOW}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 800, color: ACCENT, flexShrink: 0 }}>
-                      {p.username ? p.username[0].toUpperCase() : '?'}
+                {leaderboard.map((p, i) => {
+                  const medals = ['🥇', '🥈', '🥉']
+                  const rankColors = [GOLD, '#9CA3AF', '#B45309']
+                  const isTop3 = i < 3
+                  return (
+                    <div key={p.address} style={{ backgroundColor: CARD, border: `1px solid ${i === 0 ? GOLD + '44' : BORDER}`, borderRadius: '14px', padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: i === 0 ? `0 0 24px ${GOLD}18` : 'none' }}>
+                      <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: isTop3 ? `${rankColors[i]}18` : `${GLOW}18`, border: `1px solid ${isTop3 ? rankColors[i] + '44' : GLOW + '33'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isTop3 ? '20px' : '13px', fontWeight: 800, color: isTop3 ? rankColors[i] : MUTED, flexShrink: 0 }}>
+                        {isTop3 ? medals[i] : `#${i + 1}`}
+                      </div>
+                      <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: `linear-gradient(135deg, ${GLOW}44, ${ACCENT}22)`, border: `1px solid ${ACCENT}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: 800, color: ACCENT, flexShrink: 0 }}>
+                        {p.username ? p.username[0].toUpperCase() : '?'}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontWeight: 700, fontSize: '14px', color: i === 0 ? GOLD : TEXT }}>{p.username || shortAddr(p.address)}{p.address === address ? ' (you)' : ''}</p>
+                        <p style={{ fontSize: '11px', color: MUTED, fontFamily: 'monospace', marginTop: '2px' }}>{shortAddr(p.address)}</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
+                        <div style={{ textAlign: 'center' }}><p style={{ fontWeight: 700, color: SUCCESS, fontSize: '16px', lineHeight: 1 }}>{p.wins}</p><p style={{ fontSize: '10px', color: MUTED, marginTop: '3px' }}>Wins</p></div>
+                        <div style={{ textAlign: 'center' }}><p style={{ fontWeight: 700, color: DANGER, fontSize: '16px', lineHeight: 1 }}>{p.losses}</p><p style={{ fontSize: '10px', color: MUTED, marginTop: '3px' }}>Loss</p></div>
+                        <div style={{ textAlign: 'center' }}><p style={{ fontWeight: 700, color: GOLD, fontSize: '16px', lineHeight: 1 }}>{p.points}</p><p style={{ fontSize: '10px', color: MUTED, marginTop: '3px' }}>Pts</p></div>
+                        <div style={{ textAlign: 'center' }}><p style={{ fontWeight: 700, color: WARNING, fontSize: '16px', lineHeight: 1 }}>{p.best_streak}</p><p style={{ fontSize: '10px', color: MUTED, marginTop: '3px' }}>Streak</p></div>
+                      </div>
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontWeight: 600, fontSize: '14px' }}>{p.username || shortAddr(p.address)}{p.address === address ? ' (you)' : ''}</p>
-                      <p style={{ fontSize: '11px', color: MUTED, fontFamily: 'monospace' }}>{shortAddr(p.address)}</p>
-                    </div>
-                    <div style={{ display: 'flex', gap: '20px', textAlign: 'right' }}>
-                      <div><p style={{ fontWeight: 700, color: SUCCESS, fontSize: '15px' }}>{p.wins}</p><p style={{ fontSize: '10px', color: MUTED }}>Wins</p></div>
-                      <div><p style={{ fontWeight: 700, color: DANGER, fontSize: '15px' }}>{p.losses}</p><p style={{ fontSize: '10px', color: MUTED }}>Losses</p></div>
-                      <div><p style={{ fontWeight: 700, color: GOLD, fontSize: '15px' }}>{p.points}</p><p style={{ fontSize: '10px', color: MUTED }}>Points</p></div>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
@@ -451,7 +437,7 @@ export default function Home() {
                 </div>
 
                 {/* Stats grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(120px,calc(50% - 5px)), 1fr))', gap: '10px' }}>
                   {[
                     { icon: '⚔️', label: 'Debates', value: player.total_debates, color: TEXT },
                     { icon: '✅', label: 'Wins', value: player.wins, color: SUCCESS },
@@ -542,7 +528,7 @@ function DebateCard({ debate, address, onJoin, onClick, loading, detailed = fals
       </div>
 
       {/* Players */}
-      <div style={{ display: 'flex', gap: '8px', fontSize: '11px', color: MUTED }}>
+      <div style={{ display: 'flex', gap: '6px', fontSize: '11px', color: MUTED, flexWrap: 'wrap' }}>
         <span style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: '6px', padding: '3px 8px' }}>
           🧑 <span style={{ color: isCreator ? ACCENT : TEXT, fontFamily: 'monospace' }}>{shortAddr(debate.creator)}{isCreator ? ' (you)' : ''}</span>
         </span>
@@ -760,7 +746,7 @@ function CreateModal({ player, onClose, onSubmit, loading }: {
             <input value={topic} onChange={e => setTopic(e.target.value)} placeholder="e.g. Remote work is more productive than office work" style={inp} />
             <p style={{ fontSize: '11px', color: MUTED, marginTop: '5px' }}>{topic.length} chars · must be clearly arguable</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', color: MUTED, marginBottom: '6px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Stake (pts) <span style={{ color: GOLD }}>· {player.points} available</span></label>
               <input type="number" min={MIN_STAKE} max={max} value={stake} onChange={e => setStake(e.target.value)} style={inp} />
