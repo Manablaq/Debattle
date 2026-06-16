@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount } from 'wagmi'
+import { useAccount, useWalletClient } from 'wagmi'
 import { readContract } from '@/lib/genlayer'
 import { CONTRACT_ADDRESS, STARTING_POINTS, MIN_STAKE, MAX_STAKE, APPEAL_COST } from '@/lib/config'
 
@@ -238,6 +238,7 @@ function Clock() {
 
 export default function Home() {
   const {address}=useAccount()
+  const {data:walletClient}=useWalletClient()
   const [tab,setTab]=useState<Tab>('arena')
   const [debates,setDebates]=useState<Debate[]>([])
   const [player,setPlayer]=useState<Player|null>(null)
@@ -299,7 +300,7 @@ export default function Home() {
     addNotif('info','Tx Sent',method==='submit_argument'?'AI validators deliberating - 1-3 min':`Processing ${method}...`)
     try{
       const {writeContractWithWallet}=await import('@/lib/genlayer')
-      const r=await writeContractWithWallet(address,method,args)
+      const r=await writeContractWithWallet(address,walletClient,method,args)
       setLoading(false)
       if(r.success){addNotif('success','Confirmed',`${method} on-chain`);await fetchAll();if(address)await fetchPlayer(address);return true}
       addNotif('error','Failed',r.error??'Unknown error');return false
@@ -311,7 +312,7 @@ export default function Home() {
     setLoading(true)
     try{
       const {writeContractWithWallet}=await import('@/lib/genlayer')
-      const r=await writeContractWithWallet(address,method,args)
+      const r=await writeContractWithWallet(address,walletClient,method,args)
       setLoading(false)
       if(r.success){addNotif('success','Done',`${method} confirmed`);await fetchAll();if(address)await fetchPlayer(address);return true}
       addNotif('error','Failed',r.error??'Unknown error');return false

@@ -3,7 +3,6 @@ import { testnetBradbury } from 'genlayer-js/chains'
 import type { Address } from 'genlayer-js/types'
 import { CONTRACT_ADDRESS, TX_POLL_INTERVAL_MS, TX_TIMEOUT_MS, BRADBURY_CHAIN_ID } from './config'
 
-// Fix Bradbury node's string JSON-RPC IDs to integers (viem compatibility)
 const bradburyFetch: typeof fetch = async (input, init) => {
   if (init?.body && typeof init.body === 'string') {
     try {
@@ -20,68 +19,31 @@ const bradburyFetch: typeof fetch = async (input, init) => {
 
 const bradburyChain = { ...testnetBradbury, rpcUrls: { default: { http: ['https://rpc-bradbury.genlayer.com'] } } } as any
 
-// ---------------------------------------------------------------------------
-// getActiveProvider — finds the EIP-1193 provider that owns `address`
-// Checks every known wallet namespace so OKX, MetaMask, Coinbase, Trust,
-// Rabby, Brave, and WalletConnect-injected wallets all work correctly.
-// ---------------------------------------------------------------------------
 async function getActiveProvider(address: string): Promise<any> {
   const win = window as any
   const addr = address.toLowerCase()
-
-  // All candidate providers to check, in priority order
   const candidates: any[] = []
-
-  // OKX Wallet — injects as window.okxwallet (its own namespace)
   if (win.okxwallet) candidates.push(win.okxwallet)
-
-  // EIP-6963 multi-provider array (modern standard — multiple wallets coexist)
-  if (Array.isArray(win.ethereum?.providers)) {
-    candidates.push(...win.ethereum.providers)
-  }
-
-  // Standard window.ethereum (MetaMask, Rabby, Brave, Coinbase, etc.)
-  if (win.ethereum && !candidates.includes(win.ethereum)) {
-    candidates.push(win.ethereum)
-  }
-
-  // Coinbase Wallet dedicated namespace
-  if (win.coinbaseWalletExtension && !candidates.includes(win.coinbaseWalletExtension)) {
-    candidates.push(win.coinbaseWalletExtension)
-  }
-
-  // Trust Wallet
-  if (win.trustwallet && !candidates.includes(win.trustwallet)) {
-    candidates.push(win.trustwallet)
-  }
-
-  // Find the provider that actually holds the connected address
+  if (Array.isArray(win.ethereum?.providers)) candidates.push(...win.ethereum.providers)
+  if (win.ethereum && !candidates.includes(win.ethereum)) candidates.push(win.ethereum)
+  if (win.coinbaseWalletExtension && !candidates.includes(win.coinbaseWalletExtension)) candidates.push(win.coinbaseWalletExtension)
+  if (win.trustwallet && !candidates.includes(win.trustwallet)) candidates.push(win.trustwallet)
   for (const provider of candidates) {
     try {
       const accounts: string[] = await provider.request({ method: 'eth_accounts' })
-      if (accounts.some((a: string) => a.toLowerCase() === addr)) {
-        return provider
-      }
+      if (accounts.some((a: string) => a.toLowerCase() === addr)) return provider
     } catch {}
   }
-
-  // Fallback: return first available provider even if account check failed
-  // (handles edge cases where eth_accounts returns empty but wallet is connected)
   if (candidates.length > 0) return candidates[0]
-
   throw new Error('No wallet found. Please connect MetaMask, OKX Wallet, or another EVM wallet.')
 }
 
-// ---------------------------------------------------------------------------
-// ensureBradbury — switches/adds the Bradbury chain on the active provider
-// ---------------------------------------------------------------------------
 async function ensureBradbury(provider: any): Promise<void> {
   const current = await provider.request({ method: 'eth_chainId' })
-  if (current === BRADBURY_CHAIN_ID) return
+  if (current.toLowerCase() === BRADBURY_CHAIN_ID.toLowerCase()) return
   try {
     await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BRADBURY_CHAIN_ID }] })
   } catch (e: any) {
-    // 4902 = chain not added; -32603 = some wallets use this instead
     if (e?.code === 4902 || e?.code === -32603) {
       await provider.request({
         method: 'wallet_addEthereumChain',
@@ -93,9 +55,26 @@ async function ensureBradbury(provider: any): Promise<void> {
           blockExplorerUrls: ['https://explorer-bradbury.genlayer.com'],
         }],
       })
-    } else {
-      throw e
+    } else throw e
+  }
+}
+
+// Install the GenLayer MetaMask Snap — teaches MetaMask how to handle
+// GenLayer transactions so the "Review alert" freeze never happens
+async function ensureGenLayerSnap(provider: any): Promise<void> {
+  try {
+    const snapId = 'npm:genlayer-wallet-plugin'
+    const installedSnaps = await provider.request({ method: 'wallet_getSnaps' })
+    const isInstalled = Object.values(installedSnaps as Record<string, any>).some((s: any) => s.id === snapId)
+    if (!isInstalled) {
+      await provider.request({
+        method: 'wallet_requestSnaps',
+        params: { [snapId]: {} },
+      })
     }
+  } catch (e) {
+    // Snap install failed or not supported (OKX, Coinbase etc) — continue anyway
+    console.warn('GenLayer Snap not available on this wallet:', e)
   }
 }
 
@@ -103,8 +82,8 @@ export function getReadClient() {
   return createClient({ chain: bradburyChain, fetch: bradburyFetch } as any)
 }
 
-export function getBrowserClient(address: string) {
-  return createClient({ chain: bradburyChain, account: address, fetch: bradburyFetch } as any)
+function getBrowserClient(address: string, provider: any) {
+  return createClient({ chain: bradburyChain, account: address, provider, fetch: bradburyFetch } as any)
 }
 
 export interface TxResult {
@@ -143,7 +122,12 @@ export async function readContract(method: string, args: unknown[] = []) {
   return (client as any).readContract({ address: CONTRACT_ADDRESS as Address, functionName: method, args })
 }
 
-export async function writeContractWithWallet(address: string, method: string, args: unknown[] = []): Promise<TxResult> {
+export async function writeContractWithWallet(
+  address: string,
+  walletClient: any,
+  method: string,
+  args: unknown[] = []
+): Promise<TxResult> {
   if (!address) {
     return { success: false, statusName: 'ERROR', txExecutionResultName: 'ERROR', error: 'No wallet connected. Please connect your wallet and try again.' }
   }
@@ -161,14 +145,11 @@ export async function writeContractWithWallet(address: string, method: string, a
     return { success: false, statusName: 'ERROR', txExecutionResultName: 'ERROR', error: `Chain switch failed: ${e?.message ?? String(e)}` }
   }
 
-  // Temporarily set window.ethereum to the active provider so genlayer-js
-  // picks up the correct signer regardless of which wallet is connected
-  const win = window as any
-  const savedEthereum = win.ethereum
-  win.ethereum = provider
+  // Install GenLayer Snap so MetaMask can decode GenLayer transactions
+  await ensureGenLayerSnap(provider)
 
   try {
-    const client = getBrowserClient(address)
+    const client = getBrowserClient(address, provider)
     const txHash = await (client as any).writeContract({
       address: CONTRACT_ADDRESS as Address,
       functionName: method,
@@ -177,8 +158,5 @@ export async function writeContractWithWallet(address: string, method: string, a
     return await waitForTx(client, txHash as string)
   } catch (e: any) {
     return { success: false, statusName: 'ERROR', txExecutionResultName: 'ERROR', error: e?.message ?? String(e) }
-  } finally {
-    // Always restore window.ethereum
-    win.ethereum = savedEthereum
   }
 }
